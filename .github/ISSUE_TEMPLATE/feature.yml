@@ -1,0 +1,38 @@
+name: 기능
+description: 새 기능을 만들거나 기존 기능을 바꿔요
+labels: ["type: feature"]
+body:
+  - type: textarea
+    id: why
+    attributes:
+      label: 왜 필요한가
+      description: 누가, 어떤 상황에서, 무엇이 불편한가요?
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: 할 일
+      description: 작업을 체크리스트로 쪼개요. 1~3세션을 넘으면 이슈를 나눠요.
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 완료 기준
+      description: "테스트로 확인할 수 있는 조건으로 써요. (예: 같은 delivery_id 웹훅이 두 번 와도 풀이 기록은 1건)"
+    validations:
+      required: true
+  - type: input
+    id: refs
+    attributes:
+      label: 관련 문서
+      description: 계획 장, 도메인 규칙(R), ADR 번호
+  - type: checkboxes
+    id: adr
+    attributes:
+      label: 결정 기록
+      options:
+        - label: 되돌리기 어려운 결정이 있어서 ADR을 써야 해요 (`adr` 라벨 달기)

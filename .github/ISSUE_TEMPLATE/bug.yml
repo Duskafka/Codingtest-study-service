@@ -1,0 +1,61 @@
+name: 버그
+description: 기대와 다르게 동작해요
+labels: ["type: bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        공개 레포예요. 사용자 정보, 토큰, 웹훅 원문, 서버 주소는 지우고 적어요.
+  - type: textarea
+    id: what
+    attributes:
+      label: 무슨 일이 있었나
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 재현 방법
+      value: |
+        1.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대한 결과와 실제 결과
+    validations:
+      required: true
+  - type: dropdown
+    id: env
+    attributes:
+      label: 환경
+      options:
+        - 로컬
+        - 운영
+        - 테스트(CI)
+    validations:
+      required: true
+  - type: dropdown
+    id: impact
+    attributes:
+      label: 영향
+      description: 판정·벌금처럼 데이터가 틀어지는 문제는 가장 먼저 봐요.
+      options:
+        - 데이터가 틀어짐 (판정, 원장, 정산)
+        - 기능을 못 씀
+        - 불편하지만 우회 가능
+        - 표시 문제
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 로그와 관련 ID
+      description: 요청 ID, inbox ID, 시각(KST) 등. 민감한 값은 지워요.
+      render: text
+  - type: textarea
+    id: cause
+    attributes:
+      label: 원인 추정
+      description: 짐작 가는 원인이 있으면 적어요. 확인 전이면 '추정'이라고 적어요.
