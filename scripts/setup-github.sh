@@ -129,7 +129,24 @@ elif [ -n "$(ruleset_id)" ]; then
 else
   ruleset_json | gh api -X POST "repos/$REPO/rulesets" --input - > /dev/null
 fi
-echo "[4/6] 브랜치 규칙 (삭제·강제 push 금지, 선형 이력, PR 필수)"
+# develop은 삭제만 막아요. 릴리스 PR을 병합하면 '병합 뒤 브랜치 삭제'로 develop이 지워지고,
+# develop을 대상으로 열린 PR이 master로 바뀌는 걸 막아요. 릴리스 뒤 재설정(강제 push)은 허용해요 (CONTRIBUTING 2장).
+if [ "$VISIBILITY" = "PUBLIC" ]; then
+  if [ -n "$(gh api "repos/$REPO/rulesets" --jq '.[] | select(.name == "protect-develop") | .id')" ]; then
+    warn "브랜치 규칙 'protect-develop'이 이미 있어서 건너뛰어요."
+  else
+    gh api -X POST "repos/$REPO/rulesets" --input - > /dev/null <<'EOF'
+{
+  "name": "protect-develop",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {"ref_name": {"include": ["refs/heads/develop"], "exclude": []}},
+  "rules": [{"type": "deletion"}]
+}
+EOF
+  fi
+fi
+echo "[4/6] 브랜치 규칙 (master: 삭제·강제 push 금지, 선형 이력, PR 필수 / develop: 삭제 금지)"
 
 # 5) Actions: 기본 토큰은 읽기 전용, Actions가 PR을 승인하지 못하게
 gh api -X PUT "repos/$REPO/actions/permissions/workflow" \

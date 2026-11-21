@@ -3,7 +3,8 @@
 
 ## 관련 이슈
 
-Closes #
+<!-- develop으로 가는 PR은 Closes 키워드로 이슈가 닫히지 않아요. 병합한 뒤 이슈는 직접 닫아요 (CONTRIBUTING 4장). -->
+#
 
 ## 무엇을, 왜
 
