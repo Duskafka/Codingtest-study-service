@@ -3,7 +3,8 @@
 
 ## 관련 이슈
 
-Closes #
+<!-- develop으로 가는 PR은 Closes 키워드로 이슈가 닫히지 않아요. 병합한 뒤 이슈는 직접 닫아요 (CONTRIBUTING 4장). -->
+#
 
 ## 무엇을, 왜
 
@@ -12,7 +13,7 @@ Closes #
 ## 결정과 대안
 
 <!-- 고민한 다른 방법이 있었다면 무엇이고, 왜 버렸나?
-     되돌리기 어려운 결정이면 ADR 링크: docs/adr/NNN-제목.md -->
+     되돌리기 어려운 결정이면 ADR 링크: docs/00-Architectural Decision Records/NNN-제목.md -->
 
 ## 테스트
 
@@ -30,4 +31,4 @@ Closes #
 - [ ] DB 변경은 Flyway 마이그레이션으로만 했고, 운영 데이터에 미치는 영향을 적었다
 - [ ] 비밀값·개인정보가 코드, 로그, 테스트 데이터에 없다
 - [ ] 필요한 문서를 고쳤다 (rules.md, ADR, README)
-- [ ] AI가 만든 코드는 한 줄씩 설명할 수 있고, `docs/ai-usage.md`에 기록했다
+- [ ] AI가 만든 코드는 한 줄씩 설명할 수 있고, `docs/01-AI Usage/`에 기록했다

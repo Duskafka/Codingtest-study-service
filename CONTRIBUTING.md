@@ -7,20 +7,45 @@
 ## 1. 흐름 한눈에 보기
 
 ```
-이슈 만들기 → 브랜치 → Draft PR → 작업 → Ready → 셀프 리뷰 (+ AI 리뷰) → squash 병합 → CI → GHCR → prod 배포
+작업:   이슈 만들기 → assign (develop에서 브랜치 자동 생성) → Draft PR (→ develop) → 작업 → Ready → 셀프 리뷰 (+ AI 리뷰) → squash 병합
+릴리스: develop → master PR → squash 병합 → develop을 master에 맞춤 → GHCR → prod 배포
 ```
 
 ## 2. 브랜치
 
-- 기본 브랜치는 `master` 하나만 길게 살아 있어요. `master`는 언제나 배포 가능한 상태예요 (GitHub Flow).
-- `master`에는 직접 push할 수 없어요. 모든 변경은 PR로 들어가요.
+- 길게 사는 브랜치는 두 개예요.
+    - `master`: 배포되는 코드예요. 릴리스 PR로만 들어가요. 직접 push할 수 없어요.
+    - `develop`: 다음 릴리스를 모으는 곳이에요. 작업 브랜치는 develop에서 나와서 develop으로 돌아가요. 삭제 금지 규칙이 걸려 있어요.
 - 작업 브랜치 이름: `<타입>/<이슈번호>-<짧은-설명>`
     - 예: `feat/12-webhook-signature`, `fix/31-deadline-timezone`
+- 이슈를 assign하면 Actions(`issue-branch.yml`)가 develop에서 브랜치를 만들고 이슈에 댓글로 알려 줘요.
+    - 타입은 `type:` 라벨에서 정해요: feature → `feat`, bug → `fix`, experiment → `exp`, chore → `chore`, docs → `docs`
+    - 짧은 설명은 이슈의 '브랜치 설명 (영문)' 칸에서 가져와요.
+    - `type:` 라벨이 하나가 아니거나, 설명이 형식에 맞지 않거나, develop이 없으면 브랜치를 만들지 않고 이유를 댓글로 남겨요. 고친 뒤 assign을 해제했다가 다시 하면 돼요.
 - 브랜치는 1~3세션(2~6시간) 안에 끝나는 크기로 만들어요. 넘으면 이슈를 쪼개요.
+
+**릴리스 (develop → master)**
+
+1. 릴리스 PR을 만들고, CI가 통과하면 squash 병합해요.
+   ```sh
+   gh pr create --base master --head develop --title "chore(release): <무엇이 나가는지>"
+   ```
+2. develop을 master에 맞춰요. squash 병합이라 그대로 두면 두 브랜치의 이력이 갈라져서, 다음 릴리스 PR에 이미 넣은 변경이 다시 보이고 충돌이 날 수 있어요.
+   ```sh
+   git fetch origin
+   git diff --quiet origin/master origin/develop && git push --force-with-lease=develop:origin/develop origin origin/master:refs/heads/develop
+   ```
+    - 두 브랜치의 내용이 같을 때만 재설정해요. 차이가 있으면 아무것도 하지 않아요.
+    - 차이가 있다면 릴리스 뒤 develop에 새 커밋이 들어왔거나, master에 직접 들어간 변경이 있는 거예요. 이때 재설정하면 그 커밋이 사라지니 원인부터 확인해요.
+3. 열려 있던 작업 브랜치는 새 develop 위로 옮겨요.
+   ```sh
+   git rebase --onto origin/develop origin/develop@{1} <브랜치>
+   git push --force-with-lease
+   ```
 
 ## 3. 커밋과 PR 제목
 
-`master`에는 squash 병합만 해요. 그래서 **PR 제목이 곧 `master`의 커밋 메시지**가 돼요. PR 제목은 Conventional Commits 형식으로 써요.
+PR은 squash 병합만 해요. 그래서 **PR 제목이 곧 커밋 메시지**가 돼요. 작업 PR은 develop에, 릴리스 PR은 master에 남아요. PR 제목은 Conventional Commits 형식으로 써요.
 
 ```
 <타입>(<범위>): <무엇을 했는지>
@@ -44,9 +69,10 @@
 
 ## 4. PR
 
-1. 작업을 시작하면 바로 **Draft PR**을 열어요. 진행 상황이 PR에 쌓여요.
+1. 작업을 시작하면 바로 **Draft PR**을 열어요. 대상(base)은 `develop`이에요. 진행 상황이 PR에 쌓여요.
 2. 끝나면 템플릿을 채우고 **Ready for review**로 바꿔요. 해당 없는 칸은 지워요.
-3. 본문에 `Closes #이슈번호`를 적어 병합하면 이슈가 닫히게 해요.
+3. 본문에 `#이슈번호`를 적어 이슈와 연결해요.
+4. 병합한 뒤 이슈는 직접 닫아요 (`gh issue close <번호>`). `Closes #번호` 같은 키워드는 기본 브랜치(master)로 병합될 때만 이슈를 닫아서, develop으로 가는 PR에서는 동작하지 않아요.
 
 ## 5. 리뷰
 
@@ -58,7 +84,7 @@
 - "왜 이렇게 했지?"가 나올 만한 줄에는 내 PR에 리뷰 코멘트로 이유를 남겨요. 큰 결정이면 ADR로 옮겨요.
 
 **AI 리뷰 (선택)**
-- AI에게 diff 리뷰를 맡길 수 있어요. 지적마다 수용·거절과 이유를 PR 코멘트로 남기고, `docs/ai-usage.md`에도 기록해요.
+- AI에게 diff 리뷰를 맡길 수 있어요. 지적마다 수용·거절과 이유를 PR 코멘트로 남기고, `docs/01-AI Usage/`에도 기록해요.
 - AI 리뷰는 셀프 리뷰를 대신하지 않아요.
 
 **외부 리뷰**
@@ -67,7 +93,8 @@
 ## 6. 이슈
 
 - 한 세션을 넘는 작업, 결정이 필요한 작업은 이슈를 먼저 만들어요. 오타 수정 같은 건 이슈 없이 PR만 열어도 돼요.
-- 템플릿 세 가지: **기능**, **버그**, **실험** (측정해서 비교하는 일).
+- 템플릿 다섯 가지: **기능**, **버그**, **실험** (측정해서 비교하는 일), **작업** (설정, 의존성, CI, 리팩터링), **문서**.
+- 모든 템플릿에 '브랜치 설명 (영문)' 칸이 있어요. 영문 소문자, 숫자, `-`만 써요 (예: `webhook-signature`).
 - 단계(P1~P4)는 **마일스톤**으로, 종류와 영역은 **라벨**로 나눠요.
 
 | 라벨 | 뜻 |
@@ -92,6 +119,7 @@
     - 병합 방식: squash만 허용, PR 제목을 커밋 제목으로, 병합 뒤 브랜치 삭제
     - 라벨, 마일스톤(P1~P3)
     - `master` 보호: 삭제·강제 push 금지, 선형 이력, PR 필수(승인 0, 코멘트 해결 필수)
+    - `develop` 보호: 삭제 금지 (릴리스 뒤 재설정을 위해 강제 push는 허용)
     - Actions 기본 토큰 읽기 전용, Actions의 PR 승인 금지
     - Dependabot alerts·security updates, 비공개 취약점 제보, CodeQL
 4. **첫 CI가 돈 뒤 `sh scripts/setup-github.sh require-ci <잡 이름>`을 실행해요.** CI 통과가 병합 필수 조건이 돼요. 잡 이름은 Actions 탭에서 확인해요.
