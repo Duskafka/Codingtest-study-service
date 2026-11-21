@@ -7,7 +7,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration(proxyBeanMethods = false)
-class TestcontainersConfiguration {
+public class TestcontainersConfiguration {
 
     // 운영 DB(Supabase)와 같은 메이저 버전으로 맞춰요.
     @Bean

@@ -1,0 +1,9 @@
+# 테스트와 bootTestRun에서만 쓰여요. 환경변수(.env)가 있으면 그 값을, 없으면 가짜 값을 써요.
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID:test-client-id}
+            client-secret: ${GITHUB_CLIENT_SECRET:test-client-secret}

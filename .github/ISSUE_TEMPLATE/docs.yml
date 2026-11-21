@@ -1,0 +1,32 @@
+name: 문서
+description: 계획, ADR, 규칙, README 같은 문서 작업
+labels: ["type: docs"]
+body:
+  - type: input
+    id: branch
+    attributes:
+      label: 브랜치 설명 (영문)
+      description: "이슈를 assign하면 `<타입>/<이슈번호>-<이 값>` 브랜치가 자동으로 생겨요. 영문 소문자, 숫자, -만 써요."
+      placeholder: adr-login
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: 무엇을 왜
+      description: 무엇을 쓰거나 고치고, 왜 지금 필요한가요?
+    validations:
+      required: true
+  - type: input
+    id: target
+    attributes:
+      label: 대상 문서
+      placeholder: "docs/00-Architectural Decision Records/002-로그인 방식.md"
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: 할 일
+      value: |
+        - [ ]

@@ -13,7 +13,7 @@
 
 ## 로컬 실행
 
-Java 21과 Docker가 필요해요.
+Java 21과 Docker가 필요해요. GitHub 로그인을 해 보려면 개발용 GitHub App의 `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`을 환경변수로 넣어 주세요 (`.env`, 커밋 금지). 테스트는 없어도 돌아가요.
 
 ```sh
 ./gradlew build         # 테스트 (Testcontainers로 PostgreSQL을 띄워요)
